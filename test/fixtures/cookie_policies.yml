@@ -2,32 +2,6 @@
 
 one:
   user: one
-  title: MyString
-  generated_content: MyText
-  status: MyString
-  essential_cookies: false
-  analytics_cookies: false
-  marketing_cookies: false
-  preference_cookies: false
-  social_media_cookies: false
-  cookie_banner: false
-  third_party_cookies: MyText
-  cookie_duration: MyString
-  opt_out_method: MyString
-  cookie_refresh: false
 
 two:
   user: two
-  title: MyString
-  generated_content: MyText
-  status: MyString
-  essential_cookies: false
-  analytics_cookies: false
-  marketing_cookies: false
-  preference_cookies: false
-  social_media_cookies: false
-  cookie_banner: false
-  third_party_cookies: MyText
-  cookie_duration: MyString
-  opt_out_method: MyString
-  cookie_refresh: false

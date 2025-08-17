@@ -2,36 +2,6 @@
 
 one:
   user: one
-  title: MyString
-  generated_content: MyText
-  status: MyString
-  has_user_accounts: false
-  accepts_payments: false
-  payment_processor: MyString
-  has_subscription: false
-  cancellation_policy: MyString
-  has_user_content: false
-  content_moderation: false
-  age_restriction: 1
-  has_api: false
-  dispute_resolution: MyString
-  liability_cap: MyString
-  termination_notice: MyString
 
 two:
   user: two
-  title: MyString
-  generated_content: MyText
-  status: MyString
-  has_user_accounts: false
-  accepts_payments: false
-  payment_processor: MyString
-  has_subscription: false
-  cancellation_policy: MyString
-  has_user_content: false
-  content_moderation: false
-  age_restriction: 1
-  has_api: false
-  dispute_resolution: MyString
-  liability_cap: MyString
-  termination_notice: MyString

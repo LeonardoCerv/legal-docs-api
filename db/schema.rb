@@ -10,145 +10,127 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_17_003859) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_080500) do
   create_table "acceptable_use_policies", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "title", default: "Acceptable Use Policy"
-    t.text "generated_content"
-    t.string "status"
-    t.boolean "has_user_content", default: false
-    t.text "content_restrictions"
-    t.boolean "has_reporting", default: false
-    t.text "enforcement_actions"
-    t.boolean "has_appeals_process", default: false
-    t.string "monitoring_policy"
-    t.boolean "automated_moderation", default: false
-    t.boolean "user_responsibility", default: false
-    t.boolean "bandwidth_limits", default: false
-    t.boolean "commercial_use_allowed", default: false
-    t.boolean "resale_prohibited", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_acceptable_use_policies_on_user_id"
+    t.string "title"
+    t.date "effective_date"
+    t.text "prohibited_content"
+    t.text "prohibited_activities"
+    t.text "user_responsibilities"
+    t.text "enforcement_actions"
+    t.text "reporting_violations"
+    t.boolean "content_moderation"
+    t.boolean "age_restrictions"
+    t.boolean "commercial_use_allowed"
+    t.index ["user_id"], name: "index_acceptable_use_policies_on_user_id", unique: true
   end
 
   create_table "cookie_policies", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "title", default: "Cookie Policy"
-    t.text "generated_content"
-    t.string "status"
-    t.boolean "essential_cookies", default: false
-    t.boolean "analytics_cookies", default: false
-    t.boolean "marketing_cookies", default: false
-    t.boolean "preference_cookies", default: false
-    t.boolean "social_media_cookies", default: false
-    t.boolean "cookie_banner", default: false
-    t.text "third_party_cookies"
-    t.string "cookie_duration"
-    t.string "opt_out_method"
-    t.boolean "cookie_refresh", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_cookie_policies_on_user_id"
+    t.string "title"
+    t.date "effective_date"
+    t.boolean "essential_cookies"
+    t.boolean "analytics_cookies"
+    t.boolean "marketing_cookies"
+    t.boolean "preference_cookies"
+    t.boolean "third_party_cookies"
+    t.boolean "cookie_consent_required"
+    t.string "cookie_banner_type"
+    t.text "retention_periods"
+    t.text "opt_out_methods"
+    t.index ["user_id"], name: "index_cookie_policies_on_user_id", unique: true
   end
 
   create_table "disclaimers", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "title", default: "Disclaimer"
-    t.text "generated_content"
-    t.string "status"
-    t.string "service_type"
-    t.boolean "provides_advice", default: false
-    t.string "advice_type"
-    t.boolean "has_affiliates", default: false
-    t.boolean "liability_limitation", default: false
-    t.boolean "warranty_disclaimer", default: false
-    t.boolean "accuracy_disclaimer", default: false
-    t.boolean "third_party_links", default: false
-    t.boolean "investment_disclaimer", default: false
-    t.boolean "health_disclaimer", default: false
-    t.boolean "educational_only", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_disclaimers_on_user_id"
+    t.string "title"
+    t.date "effective_date"
+    t.string "disclaimer_type"
+    t.boolean "liability_limitation"
+    t.boolean "warranty_disclaimer"
+    t.boolean "accuracy_disclaimer"
+    t.boolean "external_links_disclaimer"
+    t.boolean "professional_advice_disclaimer"
+    t.index ["user_id"], name: "index_disclaimers_on_user_id", unique: true
   end
 
   create_table "organizations", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "company_name"
-    t.string "legal_name"
-    t.string "contact_email"
-    t.string "website_url"
-    t.text "address"
-    t.string "jurisdiction"
-    t.string "industry"
-    t.date "founded_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "legal_name"
+    t.string "industry"
+    t.string "business_type"
+    t.text "address"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "postal_code"
+    t.string "phone"
+    t.string "email"
+    t.string "website"
+    t.string "registration_number"
+    t.string "tax_id"
+    t.string "dpo_name"
+    t.string "dpo_email"
+    t.text "gdpr_representative"
+    t.integer "data_retention_period"
     t.index ["user_id"], name: "index_organizations_on_user_id", unique: true
   end
 
   create_table "privacy_policies", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "title", default: "Privacy Policy"
-    t.text "generated_content"
-    t.string "status"
-    t.boolean "collects_personal_info", default: false
-    t.text "data_types"
-    t.boolean "uses_cookies", default: false
-    t.text "third_party_services"
-    t.boolean "shares_data", default: false
-    t.boolean "sells_data", default: false
-    t.string "data_retention_period"
-    t.boolean "gdpr_compliant", default: false
-    t.boolean "ccpa_compliant", default: false
-    t.boolean "coppa_compliant", default: false
-    t.boolean "has_children_users", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "title"
+    t.date "effective_date"
+    t.text "data_types_collected"
+    t.boolean "cookies_used"
+    t.boolean "third_party_sharing"
+    t.boolean "international_transfers"
+    t.boolean "user_rights_access"
+    t.boolean "user_rights_deletion"
+    t.boolean "user_rights_portability"
+    t.integer "data_retention_period"
     t.string "contact_method"
-    t.boolean "data_protection_officer", default: false
-    t.boolean "automated_decision_making", default: false
-    t.boolean "cross_border_transfers", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_privacy_policies_on_user_id"
-  end
-
-  create_table "sessions", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.string "ip_address"
-    t.string "user_agent"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_sessions_on_user_id"
+    t.boolean "gdpr_compliant"
+    t.boolean "ccpa_compliant"
+    t.index ["user_id"], name: "index_privacy_policies_on_user_id", unique: true
   end
 
   create_table "terms_of_services", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "title", default: "Terms of Service"
-    t.text "generated_content"
-    t.boolean "has_user_accounts", default: false
-    t.boolean "accepts_payments", default: false
-    t.string "payment_processor"
-    t.boolean "has_subscription", default: false
-    t.string "cancellation_policy"
-    t.boolean "has_user_content", default: false
-    t.boolean "content_moderation", default: false
-    t.integer "age_restriction"
-    t.boolean "has_api", default: false
-    t.string "dispute_resolution"
-    t.string "liability_cap"
-    t.string "termination_notice"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_terms_of_services_on_user_id"
+    t.string "title"
+    t.date "effective_date"
+    t.boolean "acceptance_required"
+    t.integer "minimum_age"
+    t.string "governing_law"
+    t.string "jurisdiction"
+    t.string "dispute_resolution"
+    t.boolean "user_data_collection"
+    t.integer "account_termination_notice_days"
+    t.string "refund_policy"
+    t.string "service_availability"
+    t.string "user_generated_content_policy"
+    t.index ["user_id"], name: "index_terms_of_services_on_user_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email_address", null: false
-    t.string "password_digest", null: false
+    t.string "username"
+    t.string "password_digest"
+    t.string "bio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "acceptable_use_policies", "users"
@@ -156,6 +138,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_003859) do
   add_foreign_key "disclaimers", "users"
   add_foreign_key "organizations", "users"
   add_foreign_key "privacy_policies", "users"
-  add_foreign_key "sessions", "users"
   add_foreign_key "terms_of_services", "users"
 end

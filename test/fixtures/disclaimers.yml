@@ -2,34 +2,6 @@
 
 one:
   user: one
-  title: MyString
-  generated_content: MyText
-  status: MyString
-  service_type: MyString
-  provides_advice: false
-  advice_type: MyString
-  has_affiliates: false
-  liability_limitation: false
-  warranty_disclaimer: false
-  accuracy_disclaimer: false
-  third_party_links: false
-  investment_disclaimer: false
-  health_disclaimer: false
-  educational_only: false
 
 two:
   user: two
-  title: MyString
-  generated_content: MyText
-  status: MyString
-  service_type: MyString
-  provides_advice: false
-  advice_type: MyString
-  has_affiliates: false
-  liability_limitation: false
-  warranty_disclaimer: false
-  accuracy_disclaimer: false
-  third_party_links: false
-  investment_disclaimer: false
-  health_disclaimer: false
-  educational_only: false
