@@ -1,0 +1,43 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  title: MyString
+  generated_content: MyText
+  status: MyString
+  collects_personal_info: false
+  data_types: MyText
+  uses_cookies: false
+  third_party_services: MyText
+  shares_data: false
+  sells_data: false
+  data_retention_period: MyString
+  gdpr_compliant: false
+  ccpa_compliant: false
+  coppa_compliant: false
+  has_children_users: false
+  contact_method: MyString
+  data_protection_officer: false
+  automated_decision_making: false
+  cross_border_transfers: false
+
+two:
+  user: two
+  title: MyString
+  generated_content: MyText
+  status: MyString
+  collects_personal_info: false
+  data_types: MyText
+  uses_cookies: false
+  third_party_services: MyText
+  shares_data: false
+  sells_data: false
+  data_retention_period: MyString
+  gdpr_compliant: false
+  ccpa_compliant: false
+  coppa_compliant: false
+  has_children_users: false
+  contact_method: MyString
+  data_protection_officer: false
+  automated_decision_making: false
+  cross_border_transfers: false

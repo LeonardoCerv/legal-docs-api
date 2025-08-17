@@ -1,0 +1,35 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  title: MyString
+  generated_content: MyText
+  status: MyString
+  has_user_content: false
+  content_restrictions: MyText
+  has_reporting: false
+  enforcement_actions: MyText
+  has_appeals_process: false
+  monitoring_policy: MyString
+  automated_moderation: false
+  user_responsibility: false
+  bandwidth_limits: false
+  commercial_use_allowed: false
+  resale_prohibited: false
+
+two:
+  user: two
+  title: MyString
+  generated_content: MyText
+  status: MyString
+  has_user_content: false
+  content_restrictions: MyText
+  has_reporting: false
+  enforcement_actions: MyText
+  has_appeals_process: false
+  monitoring_policy: MyString
+  automated_moderation: false
+  user_responsibility: false
+  bandwidth_limits: false
+  commercial_use_allowed: false
+  resale_prohibited: false
