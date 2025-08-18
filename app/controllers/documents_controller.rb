@@ -18,6 +18,16 @@ class DocumentsController < ApplicationController
 
   def create
     type = get_type(params[:type])
+    
+    if type.nil?
+      render json: { 
+        error: 'Invalid document type',
+        message: "Document type '#{params[:type]}' is not supported",
+        supported_types: ['terms_of_service', 'privacy_policy', 'cookie_policy', 'disclaimer', 'acceptable_use_policy']
+      }, status: :bad_request
+      return
+    end
+    
     @document = type.new(doc_params)
     @document.user = current_user
 
@@ -84,49 +94,69 @@ class DocumentsController < ApplicationController
 
     def set_doc
       type = get_type(params[:type])
+      
+      if type.nil?
+        render json: { 
+          error: 'Invalid document type',
+          message: "Document type '#{params[:type]}' is not supported",
+          supported_types: ['terms_of_service', 'privacy_policy', 'cookie_policy', 'disclaimer', 'acceptable_use_policy']
+        }, status: :bad_request
+        return
+      end
+      
       @document = type.find_by(user: current_user)
     end
 
     def get_type(type)
-      {
-        'terms_of_service' => TermsOfService,
-        'privacy_policy' => PrivacyPolicy,
-        'cookie_policy' => CookiePolicy,
-        'disclaimer' => Disclaimer,
-        'acceptable_use_policy' => AcceptableUsePolicy
-      }[type]
+      return nil if type.blank?
+      
+      case type.downcase
+      when 'privacy_policy', 'privacy-policy', 'pp', 'privacypolicy'
+        PrivacyPolicy
+      when 'terms_of_service', 'terms-of-service', 'tos', 'termsofservice'
+        TermsOfService
+      when 'cookie_policy', 'cookie-policy', 'cp', 'cookiepolicy'
+        CookiePolicy
+      when 'disclaimer', 'disclaimer'
+        Disclaimer
+      when 'acceptable_use_policy', 'acceptable-use-policy', 'aup', 'acceptableusepolicy'
+        AcceptableUsePolicy
+      else
+        nil
+      end
     end
 
     def doc_params
-      case params[:type]
-      when 'terms_of_service'
+      type = get_type(params[:type])
+      case type
+      when TermsOfService
         params.expect(document: [
           :title, :effective_date, :acceptance_required, :minimum_age,
           :governing_law, :jurisdiction, :dispute_resolution, :user_data_collection,
           :account_termination_notice_days, :refund_policy, :service_availability,
           :user_generated_content_policy
         ])
-      when 'privacy_policy'
+      when PrivacyPolicy
         params.expect(document: [
           :title, :effective_date, :data_types_collected, :cookies_used,
           :third_party_sharing, :international_transfers, :user_rights_access,
           :user_rights_deletion, :user_rights_portability, :data_retention_period,
           :contact_method, :gdpr_compliant, :ccpa_compliant
         ])
-      when 'cookie_policy'
+      when CookiePolicy
         params.expect(document: [
           :title, :effective_date, :essential_cookies, :analytics_cookies,
           :marketing_cookies, :preference_cookies, :third_party_cookies,
           :cookie_consent_required, :cookie_banner_type, :retention_periods,
           :opt_out_methods
         ])
-      when 'disclaimer'
+      when Disclaimer
         params.expect(document: [
           :title, :effective_date, :disclaimer_type, :liability_limitation,
           :warranty_disclaimer, :accuracy_disclaimer, :external_links_disclaimer,
           :professional_advice_disclaimer
         ])
-      when 'acceptable_use_policy'
+      when AcceptableUsePolicy
         params.expect(document: [
           :title, :effective_date, :prohibited_content, :prohibited_activities,
           :user_responsibilities, :enforcement_actions, :reporting_violations,
