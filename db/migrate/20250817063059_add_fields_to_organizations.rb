@@ -19,6 +19,6 @@ class AddFieldsToOrganizations < ActiveRecord::Migration[8.0]
     add_column :organizations, :gdpr_representative, :text
     add_column :organizations, :data_retention_period, :integer
     
-    add_index :organizations, :user_id, unique: true
+    add_index :organizations, :user_id, unique: true unless index_exists?(:organizations, :user_id)
   end
 end
