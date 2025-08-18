@@ -27,3 +27,5 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+refer to /api-docs/index.html for documentation

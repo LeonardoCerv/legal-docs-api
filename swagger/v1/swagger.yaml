@@ -6,84 +6,1212 @@ info:
 paths:
   "/auth/login":
     post:
-      summary: login auth
+      summary: Authenticate user and receive JWT token
+      tags:
+      - Authentication
+      description: Authenticate with your username and password to receive a JWT token.
+        You should include the token in your auth header for protected paths.
+      parameters: []
       responses:
         '200':
-          description: successful
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: john_doe
+                      bio:
+                        type: string
+                        example: Mikes roofing llc
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                  token:
+                    type: string
+                    description: JWT auth token
+                    example: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.abc123
+                required:
+                - user
+                - token
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid credentials
+                  message:
+                    type: string
+                    example: Username or password is incorrect
+                required:
+                - error
+                - message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Your username
+                  example: john_doe
+                password:
+                  type: string
+                  description: Your password
+                  example: securepassword123
+              required:
+              - username
+              - password
   "/documents/{type}":
     parameters:
     - name: type
       in: path
-      description: type
+      description: 'Type of legal document to manage. Supported types: privacy_policy,
+        terms_of_service, cookie_policy, disclaimer, acceptable_use_policy'
+      enum:
+      - privacy_policy
+      - privacy-policy
+      - terms_of_service
+      - terms-of-service
+      - cookie_policy
+      - cookie-policy
+      - disclaimer
+      - acceptable_use_policy
+      - acceptable-use-policy
+      example: privacy_policy
       required: true
       schema:
         type: string
     get:
-      summary: show document
+      summary: Retrieve and generate legal document
+      tags:
+      - Legal Documents
+      description: Retrieve a legal document of the specified type for the authenticated
+        user. Returns the document configuration, organization information, and generated
+        content. The generated content is a complete legal document in markdown format
+        that can be used directly.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Document retrieved and generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    type: object
+                    description: The document object with all its properties
+                  organization:
+                    type: object
+                    description: Organization information used for document generation
+                  generated_content:
+                    type: string
+                    description: The generated legal document content in markdown
+                      format
+                    example: |-
+                      # Privacy Policy
+
+                      **Effective Date:** 2024-01-01
+
+                      This privacy policy describes...
+                required:
+                - document
+                - organization
+                - generated_content
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Document not found
+                required:
+                - error
+        '400':
+          description: Invalid document type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid document type
+                  message:
+                    type: string
+                    example: Document type 'invalid_type' is not supported
+                  supported_types:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - terms_of_service
+                    - privacy_policy
+                    - cookie_policy
+                    - disclaimer
+                    - acceptable_use_policy
+                required:
+                - error
+                - message
+                - supported_types
     post:
-      summary: create document
+      summary: Create new legal document
+      tags:
+      - Legal Documents
+      description: Create a new legal document of the specified type. The request
+        body varies depending on the document type. Each user can have one document
+        of each type.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Document created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Document successfully created
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      created_at:
+                        type: string
+                        format: date-time
+                required:
+                - status
+                - message
+                - data
+        '400':
+          description: Invalid document type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid document type
+                  message:
+                    type: string
+                    example: Document type 'invalid_type' is not supported
+                  supported_types:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - terms_of_service
+                    - privacy_policy
+                    - cookie_policy
+                    - disclaimer
+                    - acceptable_use_policy
+                required:
+                - error
+                - message
+                - supported_types
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Failed to create document
+                  errors:
+                    type: object
+                    example:
+                      title:
+                      - can't be blank
+                required:
+                - status
+                - message
+                - errors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                document:
+                  type: object
+                  description: Document properties (varies by document type)
+                  anyOf:
+                  - title: Privacy Policy
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: Privacy Policy
+                      effective_date:
+                        type: string
+                        format: date
+                        example: '2024-01-01'
+                      data_types_collected:
+                        type: string
+                        example: Personal information, usage data, cookies
+                      cookies_used:
+                        type: boolean
+                        example: true
+                      third_party_sharing:
+                        type: boolean
+                        example: false
+                      international_transfers:
+                        type: boolean
+                        example: true
+                      user_rights_access:
+                        type: boolean
+                        example: true
+                      user_rights_deletion:
+                        type: boolean
+                        example: true
+                      user_rights_portability:
+                        type: boolean
+                        example: true
+                      data_retention_period:
+                        type: integer
+                        example: 365
+                      contact_method:
+                        type: string
+                        example: email
+                      gdpr_compliant:
+                        type: boolean
+                        example: true
+                      ccpa_compliant:
+                        type: boolean
+                        example: true
+                    required:
+                    - title
+                    - effective_date
+                  - title: Terms of Service
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: Terms of Service
+                      effective_date:
+                        type: string
+                        format: date
+                        example: '2024-01-01'
+                      acceptance_required:
+                        type: boolean
+                        example: true
+                      minimum_age:
+                        type: integer
+                        example: 13
+                      governing_law:
+                        type: string
+                        example: California, USA
+                      jurisdiction:
+                        type: string
+                        example: San Francisco County, California
+                      dispute_resolution:
+                        type: string
+                        example: arbitration
+                      user_data_collection:
+                        type: boolean
+                        example: true
+                      account_termination_notice_days:
+                        type: integer
+                        example: 30
+                      refund_policy:
+                        type: string
+                        example: no_refunds
+                      service_availability:
+                        type: string
+                        example: best_effort
+                      user_generated_content_policy:
+                        type: string
+                        example: moderated
+                    required:
+                    - title
+                    - effective_date
+              required:
+              - document
     put:
-      summary: update document
+      summary: Update existing legal document
+      tags:
+      - Legal Documents
+      description: Update an existing legal document of the specified type. Only the
+        fields provided in the request will be updated. The request body format is
+        the same as the POST endpoint.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Document updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Document successfully updated
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      updated_at:
+                        type: string
+                        format: date-time
+                required:
+                - status
+                - message
+                - data
+        '400':
+          description: Invalid document type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid document type
+                required:
+                - error
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Failed to update document
+                  errors:
+                    type: object
+                    example:
+                      effective_date:
+                      - is not a valid date
+                required:
+                - status
+                - message
+                - errors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                document:
+                  type: object
+                  description: Document fields to update (varies by document type)
+              required:
+              - document
     delete:
-      summary: delete document
+      summary: Delete legal document
+      tags:
+      - Legal Documents
+      description: Permanently delete a legal document of the specified type. This
+        action cannot be undone.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Document deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Document successfully deleted
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      deleted_at:
+                        type: string
+                        format: date-time
+                required:
+                - status
+                - message
+                - data
+        '400':
+          description: Invalid document type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid document type
+                required:
+                - error
+        '422':
+          description: Unable to delete document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Failed to delete document
+                  errors:
+                    type: object
+                    example:
+                      base:
+                      - Document is referenced by other records
+                required:
+                - status
+                - message
+                - errors
   "/organization":
     get:
-      summary: show organization
+      summary: Retrieve organization information
+      tags:
+      - Your Organization
+      description: Get the organization details for the authenticated user. Each user
+        can have one organization associated with their account.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Organization information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: Tech Solutions Inc
+                  legal_name:
+                    type: string
+                    example: Tech Solutions Incorporated
+                  industry:
+                    type: string
+                    example: Technology
+                  business_type:
+                    type: string
+                    enum:
+                    - sole_proprietorship
+                    - partnership
+                    - llc
+                    - corporation
+                    - nonprofit
+                    - government
+                    - other
+                    example: corporation
+                  address:
+                    type: string
+                    example: 123 Business Ave
+                  city:
+                    type: string
+                    example: San Francisco
+                  state:
+                    type: string
+                    example: CA
+                  country:
+                    type: string
+                    example: United States
+                  postal_code:
+                    type: string
+                    example: '94105'
+                  phone:
+                    type: string
+                    example: "+1-555-123-4567"
+                  email:
+                    type: string
+                    format: email
+                    example: contact@techsolutions.com
+                  website:
+                    type: string
+                    format: uri
+                    example: https://www.techsolutions.com
+                  registration_number:
+                    type: string
+                    example: REG123456789
+                  tax_id:
+                    type: string
+                    example: TAX987654321
+                  dpo_name:
+                    type: string
+                    example: Jane Smith
+                  dpo_email:
+                    type: string
+                    format: email
+                    example: dpo@techsolutions.com
+                  gdpr_representative:
+                    type: string
+                    example: EU Rep Services Ltd
+                  data_retention_period:
+                    type: integer
+                    example: 365
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Organization not found
+                required:
+                - error
     post:
-      summary: create organization
+      summary: Create organization profile
+      tags:
+      - Your Organization
+      description: Create a new organization profile for the authenticated user. This
+        information is used to personalize generated legal documents. Each user can
+        only have one organization.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Organization created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Organization successfully created
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      created_at:
+                        type: string
+                        format: date-time
+                required:
+                - status
+                - message
+                - data
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Failed to create organization
+                  errors:
+                    type: object
+                    example:
+                      name:
+                      - can't be blank
+                required:
+                - status
+                - message
+                - errors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organization:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Common business name
+                      example: Tech Solutions Inc
+                    legal_name:
+                      type: string
+                      description: Official legal name
+                      example: Tech Solutions Incorporated
+                    industry:
+                      type: string
+                      description: Industry sector
+                      example: Technology
+                    business_type:
+                      type: string
+                      enum:
+                      - sole_proprietorship
+                      - partnership
+                      - llc
+                      - corporation
+                      - nonprofit
+                      - government
+                      - other
+                      description: Type of business entity
+                      example: corporation
+                    address:
+                      type: string
+                      description: Street address
+                      example: 123 Business Ave
+                    city:
+                      type: string
+                      description: City name
+                      example: San Francisco
+                    state:
+                      type: string
+                      description: State or province
+                      example: CA
+                    country:
+                      type: string
+                      description: Country name
+                      example: United States
+                    postal_code:
+                      type: string
+                      description: ZIP or postal code
+                      example: '94105'
+                    phone:
+                      type: string
+                      description: Contact phone number
+                      example: "+1-555-123-4567"
+                    email:
+                      type: string
+                      format: email
+                      description: Primary contact email
+                      example: contact@techsolutions.com
+                    website:
+                      type: string
+                      format: uri
+                      description: Company website URL
+                      example: https://www.techsolutions.com
+                    registration_number:
+                      type: string
+                      description: Business registration number
+                      example: REG123456789
+                    tax_id:
+                      type: string
+                      description: Tax identification number
+                      example: TAX987654321
+                    dpo_name:
+                      type: string
+                      description: Data Protection Officer name
+                      example: Jane Smith
+                    dpo_email:
+                      type: string
+                      format: email
+                      description: Data Protection Officer email
+                      example: dpo@techsolutions.com
+                    gdpr_representative:
+                      type: string
+                      description: GDPR representative organization
+                      example: EU Rep Services Ltd
+                    data_retention_period:
+                      type: integer
+                      description: Default data retention period in days
+                      example: 365
+                  required:
+                  - name
+                  - legal_name
+                  - industry
+                  - business_type
+                  - address
+                  - city
+                  - country
+                  - email
+              required:
+              - organization
     put:
-      summary: update organization
+      summary: Update organization information
+      tags:
+      - Your Organization
+      description: Update the organization profile for the authenticated user. Only
+        the fields provided in the request will be updated.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Organization successfully updated
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      updated_at:
+                        type: string
+                        format: date-time
+                required:
+                - status
+                - message
+                - data
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Failed to update organization
+                  errors:
+                    type: object
+                    example:
+                      email:
+                      - is not a valid email
+                required:
+                - status
+                - message
+                - errors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organization:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Tech Solutions Inc
+                    legal_name:
+                      type: string
+                      example: Tech Solutions Incorporated
+                    industry:
+                      type: string
+                      example: Technology
+                    business_type:
+                      type: string
+                      enum:
+                      - sole_proprietorship
+                      - partnership
+                      - llc
+                      - corporation
+                      - nonprofit
+                      - government
+                      - other
+                      example: corporation
+                    address:
+                      type: string
+                      example: 123 Business Ave
+                    city:
+                      type: string
+                      example: San Francisco
+                    state:
+                      type: string
+                      example: CA
+                    country:
+                      type: string
+                      example: United States
+                    postal_code:
+                      type: string
+                      example: '94105'
+                    phone:
+                      type: string
+                      example: "+1-555-123-4567"
+                    email:
+                      type: string
+                      format: email
+                      example: contact@techsolutions.com
+                    website:
+                      type: string
+                      format: uri
+                      example: https://www.techsolutions.com
+                    registration_number:
+                      type: string
+                      example: REG123456789
+                    tax_id:
+                      type: string
+                      example: TAX987654321
+                    dpo_name:
+                      type: string
+                      example: Jane Smith
+                    dpo_email:
+                      type: string
+                      format: email
+                      example: dpo@techsolutions.com
+                    gdpr_representative:
+                      type: string
+                      example: EU Rep Services Ltd
+                    data_retention_period:
+                      type: integer
+                      example: 365
+              required:
+              - organization
     delete:
-      summary: delete organization
+      summary: Delete organization
+      tags:
+      - Your Organization
+      description: Permanently delete the organization profile for the authenticated
+        user. This action cannot be undone and will also delete all associated documents.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Organization deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Organization successfully deleted
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      deleted_at:
+                        type: string
+                        format: date-time
+                required:
+                - status
+                - message
+                - data
+        '422':
+          description: Unable to delete organization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Failed to delete organization
+                  errors:
+                    type: object
+                    example:
+                      base:
+                      - Cannot delete organization with active documents
+                required:
+                - status
+                - message
+                - errors
   "/templates/{type}":
     parameters:
     - name: type
       in: path
-      description: type
+      description: Type of document template to retrieve. Same types as documents
+        but returns template content instead of user-specific documents.
+      enum:
+      - privacy_policy
+      - privacy-policy
+      - terms_of_service
+      - terms-of-service
+      - cookie_policy
+      - cookie-policy
+      - disclaimer
+      - acceptable_use_policy
+      - acceptable-use-policy
+      example: privacy_policy
       required: true
       schema:
         type: string
     get:
-      summary: show template
+      summary: Retrieve document template
+      tags:
+      - Legal Templates
+      description: Get a template for a specific document type. Templates provide
+        a starting point for creating legal documents. These are generic templates
+        with placeholder text that can be customized. This endpoint does not require
+        authentication.
       responses:
         '200':
-          description: successful
+          description: Template retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Template content in markdown format with placeholders
+                example: |
+                  # Terms of Service
+
+                  **Effective Date:** [DATE]
+
+                  Welcome to [COMPANY NAME]. These Terms of Service govern your use of our website and services.
+
+                  ## 1. Acceptance of Terms
+
+                  By accessing and using this service, you accept and agree to be bound by the terms and provision of this agreement.
+
+                  ## 2. Use License
+
+                  Permission is granted to temporarily download one copy of the materials on [COMPANY NAME]'s website for personal, non-commercial transitory viewing only.
+
+                  ## 3. Disclaimer
+
+                  The materials on [COMPANY NAME]'s website are provided on an 'as is' basis.
+
+                  [Additional template content...]
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Template not found
+                required:
+                - error
   "/users":
     post:
-      summary: create user
+      summary: Create a new user
+      tags:
+      - Authentication
+      description: Create a new user. Upon successful registration, returns the user
+        object and an JWT auth token for accesing protected paths.
+      parameters: []
       responses:
-        '200':
-          description: successful
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: john_doe
+                      bio:
+                        type: string
+                        example: Mikes roofing llc
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                  token:
+                    type: string
+                    description: JWT auth token
+                    example: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.abc123
+                required:
+                - user
+                - token
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Username has already been taken
+                required:
+                - errors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Username for the new account
+                  example: john_doe
+                password:
+                  type: string
+                  description: Password for the new account
+                  example: securepassword123
+                bio:
+                  type: string
+                  description: Optional bio
+                  example: Mikes roofing llc
+              required:
+              - username
+              - password
   "/me":
     get:
-      summary: me user
+      summary: Get your user info
+      tags:
+      - Authentication
+      description: Retrieve information about the current user. Requires a valid JWT
+        token in the Auth header (bearer token).
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        description: JWT token for authentication
+        example: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.abc123
+        schema:
+          type: string
       responses:
         '200':
-          description: successful
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: john_doe
+                  bio:
+                    type: string
+                    example: Mikes roofing llc
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                required:
+                - id
+                - username
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Please log in
+                required:
+                - message
 servers:
 - url: https://{defaultHost}
   variables:

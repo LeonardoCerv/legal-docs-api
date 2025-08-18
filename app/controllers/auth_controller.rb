@@ -1,28 +1,21 @@
 
-class UsersController < ApplicationController
-    skip_before_action :authorized, only: [:create]
-    rescue_from ActiveRecord::RecordInvalid, with: :handle_invalid_record
+class AuthController < ApplicationController
+    skip_before_action :authorized, only: [:login]
 
-    def create 
-        user = User.create!(user_params)
-        @token = encode_token(user_id: user.id)
-        render json: {
-            user: UserSerializer.new(user), 
-            token: @token
-        }, status: :created
-    end
-
-    def me 
-        render json: current_user, status: :ok
-    end
-
-    private
-
-    def user_params 
-        params.permit(:username, :password, :bio)
-    end
-
-    def handle_invalid_record(e)
-            render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+    def login
+        user = User.find_by(username: params[:username])
+        
+        if user && user.authenticate(params[:password])
+            token = encode_token(user_id: user.id)
+            render json: {
+                user: UserSerializer.new(user),
+                token: token
+            }, status: :ok
+        else
+            render json: {
+                error: 'Invalid credentials',
+                message: 'Username or password is incorrect'
+            }, status: :unauthorized
+        end
     end
 end
