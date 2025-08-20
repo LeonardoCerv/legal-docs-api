@@ -42,7 +42,7 @@ gem "thruster", require: false
 # Authentication
 gem 'bcrypt', '~> 3.1', '>= 3.1.12'
 
-gem 'jwt', '~> 2.5'
+gem 'jwt', '~> 3.1'
 
 gem 'rack-cors'
 
